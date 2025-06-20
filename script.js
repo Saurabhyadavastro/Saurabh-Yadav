@@ -259,7 +259,6 @@ function createParticleSystem() {
         },
         vertexShader: `
             attribute float size;
-            attribute vec3 color;
             varying vec3 vColor;
             uniform float time;
             uniform float mouseX;
@@ -1223,73 +1222,264 @@ function initScrollProgress() {
 
 // 2. Testimonials Carousel
 function initTestimonials() {
+    // Clear any existing testimonials setup
+    const existingTestimonials = document.querySelectorAll('.testimonial-prev[data-initialized], .testimonial-next[data-initialized]');
+    if (existingTestimonials.length > 0) {
+        console.log('Testimonials already initialized, skipping...');
+        return;
+    }
+
     const testimonialItems = document.querySelectorAll('.testimonial-item');
     const dots = document.querySelectorAll('.dot');
     const prevBtn = document.querySelector('.testimonial-prev');
     const nextBtn = document.querySelector('.testimonial-next');
-    let currentSlide = 0;
-    let slideInterval;
+    
+    console.log('=== TESTIMONIALS INITIALIZATION ===');
+    console.log('Items found:', testimonialItems.length);
+    console.log('Dots found:', dots.length);
+    console.log('Prev button found:', !!prevBtn);
+    console.log('Next button found:', !!nextBtn);
 
-    function showSlide(index) {
-        testimonialItems.forEach((item, i) => {
-            item.classList.toggle('active', i === index);
-        });
+    if (!testimonialItems.length || !prevBtn || !nextBtn) {
+        console.error('❌ Missing required elements for testimonials');
+        return;
+    }
+
+    let currentSlide = 0;
+    let autoPlayInterval;
+
+    // Mark buttons as initialized
+    prevBtn.setAttribute('data-initialized', 'true');
+    nextBtn.setAttribute('data-initialized', 'true');
+
+    function showSlide(slideIndex) {
+        console.log(`🔄 Switching to slide ${slideIndex}`);
         
-        dots.forEach((dot, i) => {
-            dot.classList.toggle('active', i === index);
+        // Hide all testimonials
+        testimonialItems.forEach((item, index) => {
+            item.classList.remove('active');
+            if (index === slideIndex) {
+                item.classList.add('active');
+                console.log(`✅ Activated slide ${index}`);
+            }
         });
-        
-        currentSlide = index;
+
+        // Update dots
+        dots.forEach((dot, index) => {
+            dot.classList.remove('active');
+            if (index === slideIndex) {
+                dot.classList.add('active');
+            }
+        });
+
+        currentSlide = slideIndex;
     }
 
     function nextSlide() {
-        const next = (currentSlide + 1) % testimonialItems.length;
-        showSlide(next);
+        const nextIndex = (currentSlide + 1) % testimonialItems.length;
+        console.log(`➡️ Next: ${currentSlide} → ${nextIndex}`);
+        showSlide(nextIndex);
     }
 
     function prevSlide() {
-        const prev = (currentSlide - 1 + testimonialItems.length) % testimonialItems.length;
-        showSlide(prev);
+        const prevIndex = (currentSlide - 1 + testimonialItems.length) % testimonialItems.length;
+        console.log(`⬅️ Prev: ${currentSlide} → ${prevIndex}`);
+        showSlide(prevIndex);
     }
 
     function startAutoPlay() {
-        slideInterval = setInterval(nextSlide, 5000);
+        if (autoPlayInterval) clearInterval(autoPlayInterval);
+        autoPlayInterval = setInterval(nextSlide, 5000);
+        console.log('▶️ Auto-play started');
     }
 
     function stopAutoPlay() {
-        clearInterval(slideInterval);
+        if (autoPlayInterval) {
+            clearInterval(autoPlayInterval);
+            autoPlayInterval = null;
+            console.log('⏸️ Auto-play stopped');
+        }
     }
 
-    // Event listeners
-    if (nextBtn) nextBtn.addEventListener('click', () => {
-        nextSlide();
-        stopAutoPlay();
-        startAutoPlay();
-    });
+    // Add event listeners with multiple methods for reliability
+    console.log('🔗 Adding event listeners...');
+    
+    // Method 1: Try onclick first
+    try {
+        nextBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🖱️ Next button clicked (onclick)');
+            nextSlide();
+            stopAutoPlay();
+            startAutoPlay();
+            return false;
+        };
+        console.log('✅ Next button onclick set');
+    } catch (error) {
+        console.error('❌ Next button onclick failed:', error);
+    }
 
-    if (prevBtn) prevBtn.addEventListener('click', () => {
-        prevSlide();
-        stopAutoPlay();
-        startAutoPlay();
-    });
+    try {
+        prevBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🖱️ Prev button clicked (onclick)');
+            prevSlide();
+            stopAutoPlay();
+            startAutoPlay();
+            return false;
+        };
+        console.log('✅ Prev button onclick set');
+    } catch (error) {
+        console.error('❌ Prev button onclick failed:', error);
+    }
 
-    dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-            showSlide(index);
+    // Method 2: Add event listeners as backup
+    try {
+        nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🖱️ Next button clicked (addEventListener)');
+            nextSlide();
             stopAutoPlay();
             startAutoPlay();
         });
-    });
+        console.log('✅ Next button addEventListener set');
+    } catch (error) {
+        console.error('❌ Next button addEventListener failed:', error);
+    }
 
-    // Start autoplay
-    startAutoPlay();
+    try {
+        prevBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🖱️ Prev button clicked (addEventListener)');
+            prevSlide();
+            stopAutoPlay();
+            startAutoPlay();
+        });
+        console.log('✅ Prev button addEventListener set');
+    } catch (error) {
+        console.error('❌ Prev button addEventListener failed:', error);
+    }
+
+    // Method 3: Direct attribute setting as final backup
+    try {
+        nextBtn.setAttribute('onclick', `
+            console.log('🖱️ Next button clicked (attribute)');
+            window.testimonialsTest.next();
+            return false;
+        `);
+        console.log('✅ Next button attribute set');
+    } catch (error) {
+        console.error('❌ Next button attribute failed:', error);
+    }
+
+    try {
+        prevBtn.setAttribute('onclick', `
+            console.log('🖱️ Prev button clicked (attribute)');
+            window.testimonialsTest.prev();
+            return false;
+        `);
+        console.log('✅ Prev button attribute set');
+    } catch (error) {
+        console.error('❌ Prev button attribute failed:', error);
+    }
+
+    // Dot navigation
+    dots.forEach((dot, index) => {
+        try {
+            dot.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log(`🖱️ Dot ${index} clicked`);
+                showSlide(index);
+                stopAutoPlay();
+                startAutoPlay();
+                return false;
+            };
+            
+            dot.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log(`🖱️ Dot ${index} clicked (addEventListener)`);
+                showSlide(index);
+                stopAutoPlay();
+                startAutoPlay();
+            });
+            
+            console.log(`✅ Dot ${index} handlers set`);
+        } catch (error) {
+            console.error(`❌ Dot ${index} handlers failed:`, error);
+        }
+    });
 
     // Pause on hover
     const carousel = document.querySelector('.testimonials-carousel');
     if (carousel) {
-        carousel.addEventListener('mouseenter', stopAutoPlay);
-        carousel.addEventListener('mouseleave', startAutoPlay);
+        carousel.onmouseenter = stopAutoPlay;
+        carousel.onmouseleave = startAutoPlay;
     }
+
+    // Initialize
+    showSlide(0);
+    startAutoPlay();
+
+    console.log('✅ Testimonials initialized successfully');
+    
+    // Global test functions
+    window.testimonialsTest = {
+        next: nextSlide,
+        prev: prevSlide,
+        show: showSlide,
+        current: () => currentSlide,
+        forceNext: () => {
+            console.log('🔧 Force next triggered');
+            nextSlide();
+            stopAutoPlay();
+            startAutoPlay();
+        },
+        forcePrev: () => {
+            console.log('🔧 Force prev triggered');
+            prevSlide();
+            stopAutoPlay();
+            startAutoPlay();
+        }
+    };
+
+    // Ultimate fallback - direct button access
+    setTimeout(() => {
+        const nextButton = document.querySelector('.testimonial-next');
+        const prevButton = document.querySelector('.testimonial-prev');
+        
+        if (nextButton && prevButton) {
+            console.log('🔧 Setting up direct button handlers as fallback');
+            
+            // Remove any existing handlers first
+            nextButton.onclick = null;
+            prevButton.onclick = null;
+            
+            // Set new handlers
+            nextButton.onclick = function(e) {
+                console.log('🔧 Direct next handler triggered');
+                e.preventDefault();
+                window.testimonialsTest.forceNext();
+                return false;
+            };
+            
+            prevButton.onclick = function(e) {
+                console.log('🔧 Direct prev handler triggered');
+                e.preventDefault();
+                window.testimonialsTest.forcePrev();
+                return false;
+            };
+            
+            console.log('✅ Direct button handlers set');
+        } else {
+            console.error('❌ Could not find buttons for direct fallback');
+        }
+    }, 500);
 }
 
 // 3. Project Modal
@@ -1300,29 +1490,61 @@ function initProjectModal() {
     
     // Project data
     const projectData = {
-        'code-d-code': {
-            title: 'CODE_D_CODE Platform',
-            description: 'A comprehensive learning platform for developers featuring interactive coding challenges, tutorials, and community features. Built with modern web technologies and designed for optimal user experience.',
-            image: 'images/bg_1.jpg',
-            tech: ['React', 'Node.js', 'MongoDB', 'Express', 'Socket.io'],
-            liveUrl: '#',
-            codeUrl: '#'
+        'mera-bestie': {
+            title: 'Mera Bestie - Gift Shop',
+            description: 'A vibrant and elegant gift shop UI design celebrating friendships with intuitive user experience. Features bright, cheerful colors and playful elements that resonate with the theme of friendship. Includes user-friendly navigation and responsive design across devices.',
+            image: 'images/Work/Mera Bestie/Home Page Desktop.jpg',
+            tech: ['Figma', 'UI/UX Design', 'E-commerce', 'Responsive Design'],
+            liveUrl: 'https://www.figma.com/@Saurabhyadav26',
+            codeUrl: 'https://www.figma.com/@Saurabhyadav26'
         },
-        'mobile-app': {
-            title: 'Mobile App UI Design',
-            description: 'Modern and intuitive mobile application interface design focusing on user experience and accessibility. Features clean layouts, smooth animations, and responsive design principles.',
-            image: 'images/bg_2.jpg',
-            tech: ['Figma', 'Adobe XD', 'Principle', 'InVision'],
-            liveUrl: '#',
-            codeUrl: '#'
+        'code-d-code-website': {
+            title: 'CODE_D_CODE Website',
+            description: 'Official website design for The Society CODE_D_CODE with modern interface and clean responsive UI. Features intuitive site structure for tech community with dedicated sections for study materials, events, and community updates. Designed to enhance user experience for aspiring developers.',
+            image: 'images/Work/Code_d_Code Official Website UI Design (1)/Home Page.jpg',
+            tech: ['Figma', 'Web Design', 'Community Platform', 'UI/UX'],
+            liveUrl: 'https://lnkd.in/gjrKTvkB',
+            codeUrl: 'https://www.figma.com/@Saurabhyadav26'
         },
-        'ecommerce': {
-            title: 'E-commerce Website',
-            description: 'Full-featured e-commerce platform with modern design, secure payment integration, and advanced product management. Optimized for performance and user conversion.',
-            image: 'images/bg_1.jpg',
-            tech: ['Vue.js', 'Laravel', 'MySQL', 'Stripe API', 'AWS'],
-            liveUrl: '#',
-            codeUrl: '#'
+        'candidate-page-design': {
+            title: 'Candidate Page Design',
+            description: 'Professional candidate profile page design featuring clean layout, intuitive navigation, and modern UI elements for enhanced user experience. Designed with focus on readability, professional presentation, and user-friendly interface for recruitment platforms.',
+            image: 'images/Work/Candidate page of design.png',
+            tech: ['UI/UX Design', 'Web Design', 'Profile Page', 'Professional Layout'],
+            liveUrl: 'images/Work/Candidate page of design.png',
+            codeUrl: 'https://www.figma.com/@Saurabhyadav26'
+        },
+        'lsg-fan-website': {
+            title: 'LSG Fan Website',
+            description: 'Lucknow Super Giants fan website design with modern sports-themed interface, team colors, and engaging user experience for cricket enthusiasts. Features dynamic layouts, team information, match updates, and fan community sections.',
+            image: 'images/Work/LSG-FAN-PAGE IMG/Screenshot 2025-01-21 204819.png',
+            tech: ['Figma', 'Sports Design', 'Fan Website', 'UI/UX'],
+            liveUrl: 'https://www.figma.com/@Saurabhyadav26',
+            codeUrl: 'https://www.figma.com/@Saurabhyadav26'
+        },
+        'code-d-code-poster': {
+            title: 'CODE_D_CODE Society Poster',
+            description: 'Creative poster design for CODE_D_CODE coding society featuring modern typography, vibrant colors, and engaging visual elements to promote the coding community. Designed to attract students and showcase the technical society\'s activities.',
+            image: 'images/Work/Code_d_code coding society Poster.jpg',
+            tech: ['Graphic Design', 'Poster Design', 'Typography', 'Visual Communication'],
+            liveUrl: 'images/Work/Code_d_code coding society Poster.jpg',
+            codeUrl: 'https://www.figma.com/@Saurabhyadav26'
+        },
+        'campus-vault-logo': {
+            title: 'Campus Vault Logo',
+            description: 'Professional logo design for Campus Vault featuring clean, modern aesthetics with strategic use of colors and typography for strong brand identity. Created to represent a campus-focused platform with trust and reliability.',
+            image: 'images/Work/Campus Vault Logo.png',
+            tech: ['Logo Design', 'Brand Identity', 'Vector Graphics', 'Corporate Design'],
+            liveUrl: 'images/Work/Campus Vault Logo.png',
+            codeUrl: 'https://www.figma.com/@Saurabhyadav26'
+        },
+        'code-d-code-logo': {
+            title: 'CODE_D_CODE Logo',
+            description: 'Brand logo design for CODE_D_CODE community combining technical elements with modern design principles to represent the coding society\'s identity. Features elements that symbolize programming and community collaboration.',
+            image: 'images/Work/Code_d_Code Logo.jpg',
+            tech: ['Logo Design', 'Branding', 'Tech Identity', 'Community Design'],
+            liveUrl: 'images/Work/Code_d_Code Logo.jpg',
+            codeUrl: 'https://www.figma.com/@Saurabhyadav26'
         }
     };
 
@@ -1368,8 +1590,16 @@ function initProjectModal() {
 
     // Add click handlers to project cards
     document.querySelectorAll('.work-item').forEach((item, index) => {
-        const projectIds = ['code-d-code', 'mobile-app', 'ecommerce'];
-        item.addEventListener('click', () => {
+        const projectIds = ['mera-bestie', 'code-d-code-website', 'candidate-page-design', 'lsg-fan-website', 'code-d-code-poster', 'campus-vault-logo', 'code-d-code-logo'];
+        
+        item.addEventListener('click', (e) => {
+            // Prevent modal opening if clicking on overlay links
+            if (e.target.closest('.work-link')) {
+                return;
+            }
+            
+            e.preventDefault();
+            e.stopPropagation();
             openModal(projectIds[index]);
         });
         
@@ -1381,26 +1611,75 @@ function initProjectModal() {
 // 4. Chat Widget
 function initChatWidget() {
     const chatButton = document.getElementById('chatButton');
+    const chatWidget = document.getElementById('chatWidget');
     
-    if (chatButton) {
-        chatButton.addEventListener('click', () => {
-            // Create chat message
-            const message = "Hi Saurabh! I'm interested in discussing a project with you. Let's connect!";
-            const subject = "Project Inquiry from Portfolio";
+    console.log('🗨️ Initializing chat widget...');
+    console.log('Chat button found:', !!chatButton);
+    console.log('Chat widget found:', !!chatWidget);
+    
+    if (!chatButton) {
+        console.error('❌ Chat button not found!');
+        return;
+    }
+    
+    // Add click handler
+    chatButton.addEventListener('click', function() {
+        console.log('💬 Chat button clicked!');
+        
+        // Create chat message
+        const message = "Hi Saurabh! I'm interested in discussing a project with you. Let's connect!";
+        const subject = "Project Inquiry from Portfolio";
+        
+        // Show options to user
+        const userChoice = confirm("Choose your preferred contact method:\nOK = WhatsApp\nCancel = Email");
+        
+        if (userChoice) {
+            // WhatsApp option
+            console.log('📱 Opening WhatsApp...');
+            const phoneNumber = "919876543210"; // Your WhatsApp number without + and spaces  
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
             
-            // Create WhatsApp link (replace with actual number)
-            const whatsappUrl = `https://wa.me/+919876543210?text=${encodeURIComponent(message)}`;
-            
-            // Try WhatsApp first, fallback to email
             try {
-                window.open(whatsappUrl, '_blank');
+                const whatsappWindow = window.open(whatsappUrl, '_blank');
+                if (!whatsappWindow) {
+                    console.log('Popup blocked, trying alternative...');
+                    window.location.href = whatsappUrl;
+                }
             } catch (error) {
+                console.error('WhatsApp failed:', error);
                 // Fallback to email
-                const emailUrl = `mailto:saurabhyadavrry@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-                window.location.href = emailUrl;
+                openEmail(subject, message);
             }
+        } else {
+            // Email option
+            console.log('📧 Opening email...');
+            openEmail(subject, message);
+        }
+    });
+    
+    function openEmail(subject, message) {
+        const emailUrl = `mailto:saurabhyadavrry@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+        try {
+            window.location.href = emailUrl;
+        } catch (error) {
+            console.error('Email failed:', error);
+            // Final fallback - copy email to clipboard
+            navigator.clipboard.writeText('saurabhyadavrry@gmail.com').then(() => {
+                alert('Email address copied to clipboard: saurabhyadavrry@gmail.com');
+            }).catch(() => {
+                alert('Please contact: saurabhyadavrry@gmail.com');
+            });
+        }
+    }
+    
+    // Add hover effect
+    if (chatWidget) {
+        chatWidget.addEventListener('mouseenter', function() {
+            console.log('🖱️ Chat widget hovered');
         });
     }
+    
+    console.log('✅ Chat widget initialized successfully');
 }
 
 // 5. Animated Statistics Counter
@@ -1545,18 +1824,31 @@ function initScrollAnimations() {
     });
 }
 
-// Initialize all new features
+// Initialize all features when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    // Existing initialization
+    console.log('🚀 DOM Content Loaded - Initializing portfolio...');
+    
+    // Initialize existing portfolio features
     initPortfolio();
     
-    // New features initialization
-    initScrollProgress();
-    initTestimonials();
-    initProjectModal();
-    initChatWidget();
-    initStatsCounter();
-    initSkillBars();
-    initFormValidation();
-    initScrollAnimations();
+    // Initialize testimonials immediately after DOM is ready
+    setTimeout(() => {
+        console.log('🔄 Starting feature initialization...');
+        initScrollProgress();
+        initTestimonials();
+        initProjectModal();
+        initChatWidget();
+        initStatsCounter();
+        initSkillBars();
+        initFormValidation();
+        initScrollAnimations();
+    }, 200);
 });
+
+// Force testimonials initialization if page is already loaded
+if (document.readyState === 'complete') {
+    console.log('🔥 Page already loaded - Force initializing testimonials...');
+    setTimeout(() => {
+        initTestimonials();
+    }, 100);
+}
