@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saurabh Yadav - Creative Developer & Designer</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+    </div>
+
+    <!-- 3D Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-container">
+            <!-- Background Particles -->
+            <div class="loading-particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+            </div>
+
+            <!-- 3D Holographic Cube -->
+            <div class="loading-cube-container">
+                <div class="holographic-cube">
+                    <div class="cube-face front">
+                        <div class="face-content">SY</div>
+                    </div>
+                    <div class="cube-face back">
+                        <div class="face-content">SY</div>
+                    </div>
+                    <div class="cube-face right">
+                        <div class="face-content"></div>
+                    </div>
+                    <div class="cube-face left">
+                        <div class="face-content"></div>
+                    </div>
+                    <div class="cube-face top">
+                        <div class="face-content"></div>
+                    </div>
+                    <div class="cube-face bottom">
+                        <div class="face-content"></div>
+                    </div>
+                </div>
+
+                <!-- Orbiting Elements -->
+                <div class="orbital-ring ring-1">
+                    <div class="orbital-dot"></div>
+                </div>
+                <div class="orbital-ring ring-2">
+                    <div class="orbital-dot"></div>
+                </div>
+                <div class="orbital-ring ring-3">
+                    <div class="orbital-dot"></div>
+                </div>
+            </div>
+
+            <!-- Loading Text with Glitch Effect -->
+            <div class="loading-text-container">
+                <div class="glitch-text" data-text="LOADING">LOADING</div>
+                <div class="loading-subtitle">
+                    <span class="typing-text" id="typingText"></span>
+                    <span class="cursor">|</span>
+                </div>
+            </div>
+
+            <!-- Advanced Progress Indicators -->
+            <div class="progress-container">
+                <div class="progress-wrapper">
+                    <div class="progress-bar-main">
+                        <div class="progress-fill" id="progressFill"></div>
+                        <div class="progress-glow"></div>
+                    </div>
+                    <div class="progress-percentage" id="progressText">0%</div>
+                </div>
+
+                <!-- Circular Progress -->
+                <div class="circular-progress">
+                    <svg class="progress-circle" width="60" height="60">
+                        <circle class="progress-circle-bg" cx="30" cy="30" r="25"/>
+                        <circle class="progress-circle-fill" cx="30" cy="30" r="25" id="circularProgress"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Status Messages -->
+            <div class="loading-status">
+                <div class="status-message" id="statusMessage">Initializing systems...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Designer Cursor -->
+    <div class="custom-cursor">
+        <div class="cursor-dot"></div>
+        <div class="cursor-ring"></div>
+        <div class="cursor-trail"></div>
+    </div>
+
+    <!-- Cursor Trail Elements -->
+    <div class="cursor-trails"></div>
+
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Additional 3D Background Elements -->
+    <div class="bg-3d-elements">
+        <div class="floating-geometry">
+            <div class="geo-shape geo-cube"></div>
+            <div class="geo-shape geo-pyramid"></div>
+            <div class="geo-shape geo-octahedron"></div>
+            <div class="geo-shape geo-torus"></div>
+        </div>
+
+        <div class="neural-network">
+            <div class="neural-node node-1"></div>
+            <div class="neural-node node-2"></div>
+            <div class="neural-node node-3"></div>
+            <div class="neural-node node-4"></div>
+            <div class="neural-node node-5"></div>
+            <div class="neural-node node-6"></div>
+            <div class="neural-connection connection-1"></div>
+            <div class="neural-connection connection-2"></div>
+            <div class="neural-connection connection-3"></div>
+            <div class="neural-connection connection-4"></div>
+            <div class="neural-connection connection-5"></div>
+        </div>
+
+        <div class="holographic-grid">
+            <div class="grid-line grid-horizontal"></div>
+            <div class="grid-line grid-vertical"></div>
+            <div class="grid-line grid-diagonal"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-symbol">
+                    <span>SY</span>
+                </div>
+                <div class="logo-text">
+                    <span>SAURABH YADAV</span>
+                </div>
+            </div>
+
+            <div class="nav-menu" id="navMenu">
+                <a href="#home" class="nav-link active">HOME</a>
+                <a href="#about" class="nav-link">ABOUT</a>
+                <a href="#skills" class="nav-link">SKILLS</a>
+                <a href="#work" class="nav-link">WORK</a>
+                <a href="#testimonials" class="nav-link">TESTIMONIALS</a>
+                <a href="#contact" class="nav-link">CONTACT</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <div class="theme-toggle-track">
+                        <div class="theme-toggle-thumb">
+                            <i class="fas fa-sun sun-icon"></i>
+                            <i class="fas fa-moon moon-icon"></i>
+                        </div>
+                    </div>
+                    <span class="theme-label">Dark</span>
+                </button>
+                <a href="https://drive.google.com/file/d/1gDaDSzA5R-7rJ_gE_BCNBRHOclG8k6KE/view?usp=sharing" class="resume-btn" target="_blank" rel="noopener noreferrer">
+                    <span>RESUME</span>
+                    <i class="fas fa-download"></i>
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-toggle" id="mobileToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section id="home" class="hero-section">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <!-- Status Badge -->
+                    <div class="status-badge">
+                        <div class="status-dot"></div>
+                        <span>AVAILABLE FOR PROJECTS</span>
+                    </div>
+
+                    <!-- Availability Status -->
+                    <div class="availability-status">
+                        <div class="availability-indicator">
+                            <div class="availability-dot"></div>
+                            <span>Currently accepting new clients</span>
+                        </div>
+                        <div class="response-time">
+                            <i class="fas fa-clock"></i>
+                            <span>Responds within 2 hours</span>
+                        </div>
+                    </div>
+
+                    <!-- Main Title -->
+                    <h1 class="hero-title">
+                        <span class="title-line">
+                            <span class="word">CREATIVE</span>
+                        </span>
+                        <span class="title-line gradient-text">
+                            <span class="word">DEVELOPER</span>
+                        </span>
+                        <span class="title-line">
+                            <span class="word">& DESIGNER</span>
+                        </span>
+                    </h1>
+
+                    <!-- Description -->
+                    <p class="hero-description">
+                        Crafting digital experiences that push the boundaries of creativity and technology. Specializing in UI/UX design, frontend development, and interactive animations.
+                    </p>
+
+                    <!-- CTA Buttons -->
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="scrollToSection('work')">
+                            <span>VIEW MY WORK</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button class="btn btn-secondary" onclick="scrollToSection('contact')">
+                            <span>GET IN TOUCH</span>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+
+                    <!-- Professional Stats -->
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" data-target="50">50+</div>
+                            <div class="stat-label">Projects Completed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-target="25">25+</div>
+                            <div class="stat-label">Happy Clients</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-target="3">3+</div>
+                            <div class="stat-label">Years Experience</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Visual -->
+                <div class="hero-visual">
+                    <!-- Avatar -->
+                    <div class="hero-avatar">
+                        <div class="avatar-container">
+                            <div class="avatar-rings">
+                                <div class="avatar-ring ring-1"></div>
+                                <div class="avatar-ring ring-2"></div>
+                                <div class="avatar-ring ring-3"></div>
+                            </div>
+                            <div class="avatar-image">
+                                <img src="images/ChatGPT Image Jun 20, 2025, 12_28_36 AM.png" alt="Saurabh Yadav" />
+                            </div>
+                            <div class="avatar-glow"></div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Cards -->
+                    <div class="floating-cards">
+                        <div class="floating-card card-1">
+                            <div class="card-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <span>Frontend</span>
+                        </div>
+                        <div class="floating-card card-2">
+                            <div class="card-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <span>UI/UX</span>
+                        </div>
+                        <div class="floating-card card-3">
+                            <div class="card-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <span>Mobile</span>
+                        </div>
+                        <div class="floating-card card-4">
+                            <div class="card-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <span>Animation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator">
+                <div class="scroll-line"></div>
+                <div class="scroll-text">SCROLL</div>
+                <div class="scroll-arrow">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section about-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-number">01</span>
+                    <h2 class="section-title">ABOUT ME</h2>
+                    <p class="section-subtitle">Get to know me better</p>
+                </div>
+
+                <div class="about-content">
+                    <div class="about-text">
+                        <div class="about-intro">
+                            <h3>Hello! I'm Saurabh Yadav</h3>
+                            <p>I'm a passionate UI/UX Designer and Frontend Developer pursuing B.Tech in Electronic and Computer Science at Vikram University. As the Vice-President & Founder of CODE_D_CODE, I combine creativity with technical expertise to
+                                build intuitive, engaging digital solutions.</p>
+
+                            <p>My journey in design and development started with a curiosity for creating beautiful, functional interfaces. Today, I specialize in crafting digital experiences that not only look great but also solve real problems for users.</p>
+                        </div>
+
+                        <div class="about-highlights">
+                            <div class="highlight-item">
+                                <div class="highlight-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="highlight-text">
+                                    <h4>Education</h4>
+                                    <p>B.Tech ECS, Vikram University</p>
+                                </div>
+                            </div>
+
+                            <div class="highlight-item">
+                                <div class="highlight-icon">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div class="highlight-text">
+                                    <h4>Experience</h4>
+                                    <p>3+ Years in Design & Development</p>
+                                </div>
+                            </div>
+
+                            <div class="highlight-item">
+                                <div class="highlight-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="highlight-text">
+                                    <h4>Leadership</h4>
+                                    <p>VP & Founder of CODE_D_CODE</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-image">
+                        <div class="image-container">
+                            <div class="profile-image">
+                                <img src="images/ChatGPT Image Jun 20, 2025, 12_25_20 AM.png" alt="Saurabh Yadav - About" />
+                            </div>
+                            <div class="image-decoration">
+                                <div class="decoration-ring ring-1"></div>
+                                <div class="decoration-ring ring-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="section skills-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-number">02</span>
+                    <h2 class="section-title">SKILLS & EXPERTISE</h2>
+                    <p class="section-subtitle">Technologies I work with</p>
+                </div>
+
+                <div class="skills-content">
+                    <div class="skills-grid">
+                        <div class="skill-category">
+                            <h3>Frontend</h3>
+                            <div class="skill-items">
+                                <div class="skill-item" data-skill="95">
+                                    <i class="fab fa-html5"></i>
+                                    <span>HTML5</span>
+                                </div>
+                                <div class="skill-item" data-skill="92">
+                                    <i class="fab fa-css3-alt"></i>
+                                    <span>CSS3</span>
+                                </div>
+                                <div class="skill-item" data-skill="88">
+                                    <i class="fab fa-js-square"></i>
+                                    <span>JavaScript</span>
+                                </div>
+                                <div class="skill-item" data-skill="85">
+                                    <i class="fab fa-react"></i>
+                                    <span>React</span>
+                                </div>
+                                <div class="skill-item" data-skill="82">
+                                    <i class="fab fa-vue"></i>
+                                    <span>Vue.js</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="skill-category">
+                            <h3>Design</h3>
+                            <div class="skill-items">
+                                <div class="skill-item" data-skill="95">
+                                    <i class="fab fa-figma"></i>
+                                    <span>Figma</span>
+                                </div>
+                                <div class="skill-item" data-skill="88">
+                                    <i class="fas fa-palette"></i>
+                                    <span>Adobe XD</span>
+                                </div>
+                                <div class="skill-item" data-skill="90">
+                                    <i class="fas fa-pen-nib"></i>
+                                    <span>UI/UX</span>
+                                </div>
+                                <div class="skill-item" data-skill="85">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <span>Mobile Design</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="skill-category">
+                            <h3>Tools & Others</h3>
+                            <div class="skill-items">
+                                <div class="skill-item" data-skill="90">
+                                    <i class="fab fa-git-alt"></i>
+                                    <span>Git</span>
+                                </div>
+                                <div class="skill-item" data-skill="85">
+                                    <i class="fab fa-node-js"></i>
+                                    <span>Node.js</span>
+                                </div>
+                                <div class="skill-item" data-skill="80">
+                                    <i class="fas fa-database"></i>
+                                    <span>MongoDB</span>
+                                </div>
+                                <div class="skill-item" data-skill="88">
+                                    <i class="fas fa-server"></i>
+                                    <span>REST APIs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Work Section -->
+        <section id="work" class="section work-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-number">03</span>
+                    <h2 class="section-title">FEATURED WORK</h2>
+                    <p class="section-subtitle">Some of my recent projects</p>
+                </div>
+
+                <div class="work-grid">
+                    <div class="work-item">
+                        <div class="work-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="work-overlay">
+                                <div class="work-links">
+                                    <a href="#" class="work-link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <a href="#" class="work-link">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="work-info">
+                            <h3>CODE_D_CODE Platform</h3>
+                            <p>A comprehensive coding platform for developers with interactive tutorials and project showcases.</p>
+                            <div class="work-tech">
+                                <span>React</span>
+                                <span>Node.js</span>
+                                <span>MongoDB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="work-item">
+                        <div class="work-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="work-overlay">
+                                <div class="work-links">
+                                    <a href="#" class="work-link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <a href="#" class="work-link">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="work-info">
+                            <h3>Mobile App UI Design</h3>
+                            <p>Modern mobile application interface design with focus on user experience and accessibility.</p>
+                            <div class="work-tech">
+                                <span>Figma</span>
+                                <span>UI/UX</span>
+                                <span>Mobile</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="work-item">
+                        <div class="work-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="work-overlay">
+                                <div class="work-links">
+                                    <a href="#" class="work-link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <a href="#" class="work-link">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="work-info">
+                            <h3>E-commerce Website</h3>
+                            <p>Full-stack e-commerce solution with modern design and seamless user experience.</p>
+                            <div class="work-tech">
+                                <span>React</span>
+                                <span>CSS3</span>
+                                <span>API</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section id="testimonials" class="section testimonials-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-number">04</span>
+                    <h2 class="section-title">CLIENT TESTIMONIALS</h2>
+                    <p class="section-subtitle">What clients say about my work</p>
+                </div>
+
+                <div class="testimonials-carousel">
+                    <div class="testimonial-item active">
+                        <div class="testimonial-content">
+                            <div class="testimonial-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p>"Saurabh delivered exceptional work on our project. His attention to detail and creativity exceeded our expectations. The final product was exactly what we envisioned."</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                <div class="author-info">
+                                    <h4>John Smith</h4>
+                                    <span>CEO, TechCorp</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-item">
+                        <div class="testimonial-content">
+                            <div class="testimonial-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p>"Working with Saurabh was a fantastic experience. He understood our requirements perfectly and delivered a stunning design that boosted our user engagement significantly."</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                <div class="author-info">
+                                    <h4>Sarah Johnson</h4>
+                                    <span>Product Manager, StartupXYZ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-item">
+                        <div class="testimonial-content">
+                            <div class="testimonial-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p>"Professional, creative, and reliable. Saurabh transformed our ideas into a beautiful, functional website. Highly recommended for any design project!"</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">
+                                    <i class="fas fa-user-cog"></i>
+                                </div>
+                                <div class="author-info">
+                                    <h4>Mike Chen</h4>
+                                    <span>Founder, DesignStudio</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-navigation">
+                    <button class="testimonial-prev">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="testimonial-dots">
+                        <span class="dot active" data-slide="0"></span>
+                        <span class="dot" data-slide="1"></span>
+                        <span class="dot" data-slide="2"></span>
+                    </div>
+                    <button class="testimonial-next">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section contact-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-number">05</span>
+                    <h2 class="section-title">GET IN TOUCH</h2>
+                    <p class="section-subtitle">Let's create something amazing together</p>
+                </div>
+
+                <div class="contact-content">
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Email</h4>
+                                <a href="mailto:saurabhyadavrry@gmail.com">saurabhyadavrry@gmail.com</a>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Phone</h4>
+                                <a href="tel:+91-9876543210">+91-9876543210</a>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Location</h4>
+                                <span>India</span>
+                            </div>
+                        </div>
+
+                        <div class="social-links">
+                            <a href="https://www.linkedin.com/in/saurabh-yadav-3b4371169" target="_blank" class="social-link">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="https://github.com/Saurabhyadavastro" target="_blank" class="social-link">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.figma.com/@Saurabhyadav26" target="_blank" class="social-link">
+                                <i class="fab fa-figma"></i>
+                            </a>
+                            <a href="https://www.instagram.com/saurabh_yadav_sky__/" target="_blank" class="social-link">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-form">
+                        <form class="contact-form" id="contactForm">
+                            <div class="form-group">
+                                <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" name="email" class="form-control" placeholder="Your Email" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="subject" class="form-control" placeholder="Subject" required>
+                            </div>
+                            <div class="form-group">
+                                <textarea name="message" class="form-control" rows="6" placeholder="Your Message" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <span>Send Message</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Project Quick Preview Modal -->
+    <div class="project-modal" id="projectModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-body">
+                <div class="modal-gallery">
+                    <img id="modalImage" src="" alt="Project Preview">
+                </div>
+                <div class="modal-info">
+                    <h3 id="modalTitle">Project Title</h3>
+                    <p id="modalDescription">Project description...</p>
+                    <div class="modal-tech" id="modalTech"></div>
+                    <div class="modal-links">
+                        <a href="#" class="modal-link" id="modalLive">
+                            <i class="fas fa-external-link-alt"></i> Live Demo
+                        </a>
+                        <a href="#" class="modal-link" id="modalCode">
+                            <i class="fab fa-github"></i> View Code
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Chat Widget -->
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-button" id="chatButton">
+            <i class="fas fa-comments"></i>
+            <span class="chat-pulse"></span>
+        </div>
+        <div class="chat-tooltip">Let's discuss your project!</div>
+    </div>
+
+    <!-- Scroll to Top -->
+    <button class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
