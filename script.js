@@ -259,6 +259,7 @@ function createParticleSystem() {
         },
         vertexShader: `
             attribute float size;
+            attribute vec3 color;
             varying vec3 vColor;
             uniform float time;
             uniform float mouseX;
@@ -1222,10 +1223,9 @@ function initScrollProgress() {
 
 // 2. Testimonials Carousel
 function initTestimonials() {
-    // Clear any existing testimonials setup
-    const existingTestimonials = document.querySelectorAll('.testimonial-prev[data-initialized], .testimonial-next[data-initialized]');
-    if (existingTestimonials.length > 0) {
-        console.log('Testimonials already initialized, skipping...');
+    // Prevent double initialization
+    if (document.querySelector('.testimonial-prev')?.hasAttribute('data-initialized')) {
+        console.log('Testimonials already initialized');
         return;
     }
 
@@ -1233,253 +1233,128 @@ function initTestimonials() {
     const dots = document.querySelectorAll('.dot');
     const prevBtn = document.querySelector('.testimonial-prev');
     const nextBtn = document.querySelector('.testimonial-next');
-    
-    console.log('=== TESTIMONIALS INITIALIZATION ===');
-    console.log('Items found:', testimonialItems.length);
-    console.log('Dots found:', dots.length);
-    console.log('Prev button found:', !!prevBtn);
-    console.log('Next button found:', !!nextBtn);
+    let currentSlide = 0;
+    let slideInterval;
 
+    console.log('Testimonials initialized:', {
+        testimonialItems: testimonialItems.length,
+        dots: dots.length,
+        prevBtn: !!prevBtn,
+        nextBtn: !!nextBtn
+    });
+
+    // Check if we have the necessary elements
     if (!testimonialItems.length || !prevBtn || !nextBtn) {
-        console.error('❌ Missing required elements for testimonials');
+        console.error('Missing testimonial elements');
         return;
     }
 
-    let currentSlide = 0;
-    let autoPlayInterval;
-
-    // Mark buttons as initialized
+    // Mark as initialized
     prevBtn.setAttribute('data-initialized', 'true');
     nextBtn.setAttribute('data-initialized', 'true');
 
-    function showSlide(slideIndex) {
-        console.log(`🔄 Switching to slide ${slideIndex}`);
+    function showSlide(index) {
+        console.log('Showing slide:', index, 'of', testimonialItems.length);
         
-        // Hide all testimonials
-        testimonialItems.forEach((item, index) => {
-            item.classList.remove('active');
-            if (index === slideIndex) {
+        // Remove active class from all items and dots
+        testimonialItems.forEach((item, i) => {
+            if (i === index) {
                 item.classList.add('active');
-                console.log(`✅ Activated slide ${index}`);
+                console.log(`Added active to item ${i}`);
+            } else {
+                item.classList.remove('active');
+                console.log(`Removed active from item ${i}`);
             }
         });
-
-        // Update dots
-        dots.forEach((dot, index) => {
-            dot.classList.remove('active');
-            if (index === slideIndex) {
+        
+        dots.forEach((dot, i) => {
+            if (i === index) {
                 dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
             }
         });
-
-        currentSlide = slideIndex;
+        
+        currentSlide = index;
+        
+        // Double-check the active state
+        const activeItem = document.querySelector('.testimonial-item.active');
+        console.log('Active item after change:', activeItem ? 'Found' : 'Not found');
     }
 
     function nextSlide() {
-        const nextIndex = (currentSlide + 1) % testimonialItems.length;
-        console.log(`➡️ Next: ${currentSlide} → ${nextIndex}`);
-        showSlide(nextIndex);
+        const next = (currentSlide + 1) % testimonialItems.length;
+        console.log('Next slide - current:', currentSlide, 'next:', next);
+        showSlide(next);
     }
 
     function prevSlide() {
-        const prevIndex = (currentSlide - 1 + testimonialItems.length) % testimonialItems.length;
-        console.log(`⬅️ Prev: ${currentSlide} → ${prevIndex}`);
-        showSlide(prevIndex);
+        const prev = (currentSlide - 1 + testimonialItems.length) % testimonialItems.length;
+        console.log('Prev slide - current:', currentSlide, 'prev:', prev);
+        showSlide(prev);
     }
 
     function startAutoPlay() {
-        if (autoPlayInterval) clearInterval(autoPlayInterval);
-        autoPlayInterval = setInterval(nextSlide, 5000);
-        console.log('▶️ Auto-play started');
+        slideInterval = setInterval(nextSlide, 5000);
+        console.log('Auto-play started');
     }
 
     function stopAutoPlay() {
-        if (autoPlayInterval) {
-            clearInterval(autoPlayInterval);
-            autoPlayInterval = null;
-            console.log('⏸️ Auto-play stopped');
-        }
+        clearInterval(slideInterval);
+        console.log('Auto-play stopped');
     }
 
-    // Add event listeners with multiple methods for reliability
-    console.log('🔗 Adding event listeners...');
-    
-    // Method 1: Try onclick first
-    try {
-        nextBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('🖱️ Next button clicked (onclick)');
-            nextSlide();
-            stopAutoPlay();
-            startAutoPlay();
-            return false;
-        };
-        console.log('✅ Next button onclick set');
-    } catch (error) {
-        console.error('❌ Next button onclick failed:', error);
-    }
-
-    try {
-        prevBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('🖱️ Prev button clicked (onclick)');
-            prevSlide();
-            stopAutoPlay();
-            startAutoPlay();
-            return false;
-        };
-        console.log('✅ Prev button onclick set');
-    } catch (error) {
-        console.error('❌ Prev button onclick failed:', error);
-    }
-
-    // Method 2: Add event listeners as backup
-    try {
-        nextBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('🖱️ Next button clicked (addEventListener)');
-            nextSlide();
-            stopAutoPlay();
-            startAutoPlay();
-        });
-        console.log('✅ Next button addEventListener set');
-    } catch (error) {
-        console.error('❌ Next button addEventListener failed:', error);
-    }
-
-    try {
-        prevBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('🖱️ Prev button clicked (addEventListener)');
-            prevSlide();
-            stopAutoPlay();
-            startAutoPlay();
-        });
-        console.log('✅ Prev button addEventListener set');
-    } catch (error) {
-        console.error('❌ Prev button addEventListener failed:', error);
-    }
-
-    // Method 3: Direct attribute setting as final backup
-    try {
-        nextBtn.setAttribute('onclick', `
-            console.log('🖱️ Next button clicked (attribute)');
-            window.testimonialsTest.next();
-            return false;
-        `);
-        console.log('✅ Next button attribute set');
-    } catch (error) {
-        console.error('❌ Next button attribute failed:', error);
-    }
-
-    try {
-        prevBtn.setAttribute('onclick', `
-            console.log('🖱️ Prev button clicked (attribute)');
-            window.testimonialsTest.prev();
-            return false;
-        `);
-        console.log('✅ Prev button attribute set');
-    } catch (error) {
-        console.error('❌ Prev button attribute failed:', error);
-    }
-
-    // Dot navigation
-    dots.forEach((dot, index) => {
-        try {
-            dot.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log(`🖱️ Dot ${index} clicked`);
-                showSlide(index);
-                stopAutoPlay();
-                startAutoPlay();
-                return false;
-            };
-            
-            dot.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log(`🖱️ Dot ${index} clicked (addEventListener)`);
-                showSlide(index);
-                stopAutoPlay();
-                startAutoPlay();
-            });
-            
-            console.log(`✅ Dot ${index} handlers set`);
-        } catch (error) {
-            console.error(`❌ Dot ${index} handlers failed:`, error);
-        }
+    // Event listeners with detailed logging
+    nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Next button clicked - current slide:', currentSlide);
+        nextSlide();
+        stopAutoPlay();
+        startAutoPlay();
     });
+
+    prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Prev button clicked - current slide:', currentSlide);
+        prevSlide();
+        stopAutoPlay();
+        startAutoPlay();
+    });
+
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Dot clicked:', index);
+            showSlide(index);
+            stopAutoPlay();
+            startAutoPlay();
+        });
+    });
+
+    // Initialize first slide
+    console.log('Initializing first slide');
+    showSlide(0);
+
+    // Start autoplay
+    startAutoPlay();
 
     // Pause on hover
     const carousel = document.querySelector('.testimonials-carousel');
     if (carousel) {
-        carousel.onmouseenter = stopAutoPlay;
-        carousel.onmouseleave = startAutoPlay;
+        carousel.addEventListener('mouseenter', stopAutoPlay);
+        carousel.addEventListener('mouseleave', startAutoPlay);
     }
 
-    // Initialize
-    showSlide(0);
-    startAutoPlay();
-
-    console.log('✅ Testimonials initialized successfully');
-    
-    // Global test functions
-    window.testimonialsTest = {
+    // Add a manual test function to window for debugging
+    window.testTestimonials = {
         next: nextSlide,
         prev: prevSlide,
         show: showSlide,
-        current: () => currentSlide,
-        forceNext: () => {
-            console.log('🔧 Force next triggered');
-            nextSlide();
-            stopAutoPlay();
-            startAutoPlay();
-        },
-        forcePrev: () => {
-            console.log('🔧 Force prev triggered');
-            prevSlide();
-            stopAutoPlay();
-            startAutoPlay();
-        }
+        getCurrentSlide: () => currentSlide,
+        getActiveItem: () => document.querySelector('.testimonial-item.active')
     };
-
-    // Ultimate fallback - direct button access
-    setTimeout(() => {
-        const nextButton = document.querySelector('.testimonial-next');
-        const prevButton = document.querySelector('.testimonial-prev');
-        
-        if (nextButton && prevButton) {
-            console.log('🔧 Setting up direct button handlers as fallback');
-            
-            // Remove any existing handlers first
-            nextButton.onclick = null;
-            prevButton.onclick = null;
-            
-            // Set new handlers
-            nextButton.onclick = function(e) {
-                console.log('🔧 Direct next handler triggered');
-                e.preventDefault();
-                window.testimonialsTest.forceNext();
-                return false;
-            };
-            
-            prevButton.onclick = function(e) {
-                console.log('🔧 Direct prev handler triggered');
-                e.preventDefault();
-                window.testimonialsTest.forcePrev();
-                return false;
-            };
-            
-            console.log('✅ Direct button handlers set');
-        } else {
-            console.error('❌ Could not find buttons for direct fallback');
-        }
-    }, 500);
 }
 
 // 3. Project Modal
@@ -1611,75 +1486,26 @@ function initProjectModal() {
 // 4. Chat Widget
 function initChatWidget() {
     const chatButton = document.getElementById('chatButton');
-    const chatWidget = document.getElementById('chatWidget');
     
-    console.log('🗨️ Initializing chat widget...');
-    console.log('Chat button found:', !!chatButton);
-    console.log('Chat widget found:', !!chatWidget);
-    
-    if (!chatButton) {
-        console.error('❌ Chat button not found!');
-        return;
-    }
-    
-    // Add click handler
-    chatButton.addEventListener('click', function() {
-        console.log('💬 Chat button clicked!');
-        
-        // Create chat message
-        const message = "Hi Saurabh! I'm interested in discussing a project with you. Let's connect!";
-        const subject = "Project Inquiry from Portfolio";
-        
-        // Show options to user
-        const userChoice = confirm("Choose your preferred contact method:\nOK = WhatsApp\nCancel = Email");
-        
-        if (userChoice) {
-            // WhatsApp option
-            console.log('📱 Opening WhatsApp...');
-            const phoneNumber = "919876543210"; // Your WhatsApp number without + and spaces  
-            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    if (chatButton) {
+        chatButton.addEventListener('click', () => {
+            // Create chat message
+            const message = "Hi Saurabh! I'm interested in discussing a project with you. Let's connect!";
+            const subject = "Project Inquiry from Portfolio";
             
+            // Create WhatsApp link (replace with actual number)
+            const whatsappUrl = `https://wa.me/+919876543210?text=${encodeURIComponent(message)}`;
+            
+            // Try WhatsApp first, fallback to email
             try {
-                const whatsappWindow = window.open(whatsappUrl, '_blank');
-                if (!whatsappWindow) {
-                    console.log('Popup blocked, trying alternative...');
-                    window.location.href = whatsappUrl;
-                }
+                window.open(whatsappUrl, '_blank');
             } catch (error) {
-                console.error('WhatsApp failed:', error);
                 // Fallback to email
-                openEmail(subject, message);
+                const emailUrl = `mailto:saurabhyadavrry@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+                window.location.href = emailUrl;
             }
-        } else {
-            // Email option
-            console.log('📧 Opening email...');
-            openEmail(subject, message);
-        }
-    });
-    
-    function openEmail(subject, message) {
-        const emailUrl = `mailto:saurabhyadavrry@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-        try {
-            window.location.href = emailUrl;
-        } catch (error) {
-            console.error('Email failed:', error);
-            // Final fallback - copy email to clipboard
-            navigator.clipboard.writeText('saurabhyadavrry@gmail.com').then(() => {
-                alert('Email address copied to clipboard: saurabhyadavrry@gmail.com');
-            }).catch(() => {
-                alert('Please contact: saurabhyadavrry@gmail.com');
-            });
-        }
-    }
-    
-    // Add hover effect
-    if (chatWidget) {
-        chatWidget.addEventListener('mouseenter', function() {
-            console.log('🖱️ Chat widget hovered');
         });
     }
-    
-    console.log('✅ Chat widget initialized successfully');
 }
 
 // 5. Animated Statistics Counter
@@ -1824,16 +1650,13 @@ function initScrollAnimations() {
     });
 }
 
-// Initialize all features when DOM is ready
+// Initialize all new features
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 DOM Content Loaded - Initializing portfolio...');
-    
-    // Initialize existing portfolio features
+    // Existing initialization
     initPortfolio();
     
-    // Initialize testimonials immediately after DOM is ready
+    // New features initialization with delay to ensure DOM is fully loaded
     setTimeout(() => {
-        console.log('🔄 Starting feature initialization...');
         initScrollProgress();
         initTestimonials();
         initProjectModal();
@@ -1842,13 +1665,18 @@ document.addEventListener('DOMContentLoaded', function() {
         initSkillBars();
         initFormValidation();
         initScrollAnimations();
-    }, 200);
+    }, 100);
 });
 
-// Force testimonials initialization if page is already loaded
-if (document.readyState === 'complete') {
-    console.log('🔥 Page already loaded - Force initializing testimonials...');
+// Backup initialization in case DOMContentLoaded has already fired
+if (document.readyState === 'loading') {
+    // Document still loading, wait for DOMContentLoaded
+} else {
+    // Document already loaded
     setTimeout(() => {
-        initTestimonials();
-    }, 100);
+        if (document.querySelector('.testimonial-prev') && !document.querySelector('.testimonial-prev').hasAttribute('data-initialized')) {
+            console.log('Running backup testimonials initialization');
+            initTestimonials();
+        }
+    }, 500);
 }
