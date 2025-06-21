@@ -587,57 +587,170 @@ function initMobileMenu() {
     const mobileToggle = document.getElementById('mobileToggle');
     const navMenu = document.getElementById('navMenu');
     const navLinks = document.querySelectorAll('.nav-link');
+    const navbar = document.querySelector('.navbar');
 
     if (mobileToggle && navMenu) {
-        // Toggle mobile menu
+        // Enhanced accessibility attributes
+        mobileToggle.setAttribute('aria-label', 'Toggle navigation menu');
+        mobileToggle.setAttribute('aria-expanded', 'false');
+        navMenu.setAttribute('aria-hidden', 'true');
+
+        // Function to close mobile menu
+        function closeMobileMenu() {
+            navMenu.classList.remove('active');
+            mobileToggle.classList.remove('active');
+            mobileToggle.setAttribute('aria-expanded', 'false');
+            navMenu.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            document.body.classList.remove('menu-open');
+        }
+
+        // Function to open mobile menu
+        function openMobileMenu() {
+            navMenu.classList.add('active');
+            mobileToggle.classList.add('active');
+            mobileToggle.setAttribute('aria-expanded', 'true');
+            navMenu.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            document.body.classList.add('menu-open');
+
+            // Focus first nav link for keyboard navigation
+            const firstNavLink = navMenu.querySelector('.nav-link');
+            if (firstNavLink) {
+                setTimeout(() => firstNavLink.focus(), 100);
+            }
+        }
+
+        // Toggle mobile menu with enhanced functionality
         mobileToggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            navMenu.classList.toggle('active');
-            mobileToggle.classList.toggle('active');
+            e.preventDefault();
 
-            // Prevent body scroll when menu is open
-            if (navMenu.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
+            const isActive = navMenu.classList.contains('active');
+
+            if (isActive) {
+                closeMobileMenu();
             } else {
-                document.body.style.overflow = '';
+                openMobileMenu();
             }
         });
 
-        // Close menu when clicking on nav links
+        // Enhanced nav link interaction
         navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('active');
-                mobileToggle.classList.remove('active');
-                document.body.style.overflow = '';
+            link.addEventListener('click', (e) => {
+                // Close menu with delay for smooth transition
+                setTimeout(() => {
+                    closeMobileMenu();
+                }, 150);
+            });
+
+            // Enhanced keyboard navigation
+            link.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    link.click();
+                }
             });
         });
 
-        // Close menu when clicking outside
+        // Close menu when clicking outside (improved)
         document.addEventListener('click', (e) => {
-            if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
-                navMenu.classList.remove('active');
-                mobileToggle.classList.remove('active');
-                document.body.style.overflow = '';
+            if (navMenu.classList.contains('active') &&
+                !navMenu.contains(e.target) &&
+                !mobileToggle.contains(e.target) &&
+                !navbar.contains(e.target)) {
+                closeMobileMenu();
             }
         });
 
-        // Close menu on escape key
+        // Enhanced keyboard navigation
         document.addEventListener('keydown', (e) => {
+            // Close menu on escape key
             if (e.key === 'Escape' && navMenu.classList.contains('active')) {
-                navMenu.classList.remove('active');
-                mobileToggle.classList.remove('active');
-                document.body.style.overflow = '';
+                closeMobileMenu();
+                mobileToggle.focus();
+            }
+
+            // Tab trap within mobile menu when active
+            if (navMenu.classList.contains('active') && e.key === 'Tab') {
+                const focusableElements = navMenu.querySelectorAll(
+                    'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
+                );
+                const firstElement = focusableElements[0];
+                const lastElement = focusableElements[focusableElements.length - 1];
+
+                if (e.shiftKey) {
+                    if (document.activeElement === firstElement) {
+                        lastElement.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === lastElement) {
+                        firstElement.focus();
+                        e.preventDefault();
+                    }
+                }
             }
         });
 
-        // Handle window resize
+        // Enhanced window resize handling
+        let resizeTimer;
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 991) {
-                navMenu.classList.remove('active');
-                mobileToggle.classList.remove('active');
-                document.body.style.overflow = '';
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (window.innerWidth > 991 && navMenu.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+
+                // Adjust navbar height based on screen size
+                if (window.innerWidth <= 480) {
+                    navbar.style.setProperty('--navbar-height', '60px');
+                } else if (window.innerWidth <= 768) {
+                    navbar.style.setProperty('--navbar-height', '70px');
+                } else {
+                    navbar.style.setProperty('--navbar-height', '80px');
+                }
+            }, 250);
+        });
+
+        // Touch gesture support for mobile menu
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        navMenu.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+
+        navMenu.addEventListener('touchmove', (e) => {
+            if (navMenu.classList.contains('active')) {
+                const touchX = e.touches[0].clientX;
+                const touchY = e.touches[0].clientY;
+                const diffX = touchStartX - touchX;
+                const diffY = touchStartY - touchY;
+
+                // Swipe right to close menu (for tablet sidebar)
+                if (window.innerWidth > 480 && diffX < -100 && Math.abs(diffY) < 50) {
+                    closeMobileMenu();
+                }
             }
         });
+
+        // Orientation change handling
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                if (navMenu.classList.contains('active')) {
+                    // Recalculate menu position after orientation change
+                    navMenu.style.height = window.innerHeight + 'px';
+                }
+            }, 100);
+        });
+
+        // Initialize navbar height CSS variable
+        navbar.style.setProperty('--navbar-height',
+            window.innerWidth <= 480 ? '60px' :
+            window.innerWidth <= 768 ? '70px' : '80px'
+        );
     }
 }
 
@@ -1580,30 +1693,7 @@ function initProjectModal() {
     });
 }
 
-// 4. Chat Widget
-function initChatWidget() {
-    const chatButton = document.getElementById('chatButton');
-    
-    if (chatButton) {
-        chatButton.addEventListener('click', () => {
-            // Create chat message
-            const message = "Hi Saurabh! I'm interested in discussing a project with you. Let's connect!";
-            const subject = "Project Inquiry from Portfolio";
-            
-            // Create WhatsApp link (replace with actual number)
-            const whatsappUrl = `https://wa.me/+919876543210?text=${encodeURIComponent(message)}`;
-            
-            // Try WhatsApp first, fallback to email
-            try {
-                window.open(whatsappUrl, '_blank');
-            } catch (error) {
-                // Fallback to email
-                const emailUrl = `mailto:saurabhyadavrry@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-                window.location.href = emailUrl;
-            }
-        });
-    }
-}
+
 
 // 5. Animated Statistics Counter
 function initStatsCounter() {
@@ -1757,7 +1847,6 @@ document.addEventListener('DOMContentLoaded', function() {
         initScrollProgress();
         initTestimonials();
         initProjectModal();
-        initChatWidget();
         initStatsCounter();
         initSkillBars();
         initFormValidation();
