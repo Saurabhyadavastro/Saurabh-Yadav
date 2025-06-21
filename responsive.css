@@ -1,0 +1,441 @@
+/* Responsive Optimizations and Mobile-First Improvements */
+
+
+/* Mobile-First Approach */
+
+
+/* Base styles are mobile-first, then enhanced for larger screens */
+
+
+/* Touch-friendly interactions */
+
+@media (pointer: coarse) {
+    .btn,
+    .nav-link,
+    .work-link,
+    .social-link {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.75rem 1.5rem;
+    }
+    .mobile-toggle {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.75rem;
+    }
+}
+
+
+/* Improved touch targets for mobile */
+
+@media (max-width: 768px) {
+    .nav-link {
+        padding: 1rem 0;
+        margin: 0.5rem 0;
+        font-size: 1.25rem;
+    }
+    .btn {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        min-height: 48px;
+    }
+    .work-link,
+    .social-link {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .testimonial-prev,
+    .testimonial-next {
+        width: 48px;
+        height: 48px;
+        font-size: 1.25rem;
+    }
+}
+
+
+/* Optimize images for mobile */
+
+@media (max-width: 768px) {
+    .work-image img,
+    .avatar-image img,
+    .profile-image img {
+        image-rendering: optimizeSpeed;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: optimize-contrast;
+    }
+}
+
+
+/* Better spacing for mobile */
+
+@media (max-width: 480px) {
+    .section {
+        padding: 2rem 0;
+    }
+    .section-container {
+        padding: 0 1rem;
+    }
+    .hero-section {
+        padding: 1rem 0 2rem;
+    }
+    .hero-content {
+        padding: 1rem 0;
+    }
+    .hero-buttons {
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .about-highlights {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .highlight-item {
+        padding: 1rem;
+        text-align: center;
+    }
+    .contact-form {
+        margin-top: 2rem;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+}
+
+
+/* Enhanced mobile navigation */
+
+@media (max-width: 991px) {
+    .nav-menu {
+        transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .nav-menu.active {
+        animation: slideInRight 0.4s ease-out;
+    }
+    .nav-link {
+        opacity: 0;
+        transform: translateX(50px);
+        transition: all 0.3s ease;
+    }
+    .nav-menu.active .nav-link {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    .nav-menu.active .nav-link:nth-child(1) {
+        transition-delay: 0.1s;
+    }
+    .nav-menu.active .nav-link:nth-child(2) {
+        transition-delay: 0.2s;
+    }
+    .nav-menu.active .nav-link:nth-child(3) {
+        transition-delay: 0.3s;
+    }
+    .nav-menu.active .nav-link:nth-child(4) {
+        transition-delay: 0.4s;
+    }
+    .nav-menu.active .nav-link:nth-child(5) {
+        transition-delay: 0.5s;
+    }
+    .nav-menu.active .nav-link:nth-child(6) {
+        transition-delay: 0.6s;
+    }
+}
+
+
+/* Improved grid layouts for mobile */
+
+@media (max-width: 768px) {
+    .skills-categories {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    .skills-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+    }
+    .work-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    .skill-item {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    .skill-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+}
+
+
+/* Better modal experience on mobile */
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95vw;
+        height: 90vh;
+        margin: 5vh auto;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .modal-body {
+        padding: 1rem;
+        overflow-y: auto;
+    }
+    .modal-gallery img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+    }
+    .modal-close {
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
+}
+
+
+/* Improved testimonials for mobile */
+
+@media (max-width: 768px) {
+    .testimonials-carousel {
+        margin: 0 1rem;
+    }
+    .testimonial-content {
+        padding: 1.5rem;
+    }
+    .testimonial-author {
+        margin-top: 1rem;
+    }
+    .author-avatar {
+        width: 50px;
+        height: 50px;
+    }
+    .testimonial-navigation {
+        margin-top: 1rem;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .testimonial-dots {
+        order: 2;
+    }
+    .testimonial-prev {
+        order: 1;
+    }
+    .testimonial-next {
+        order: 3;
+    }
+}
+
+
+/* Loading screen optimizations for mobile */
+
+@media (max-width: 768px) {
+    .loading-cube-container {
+        transform: scale(0.7);
+    }
+    .loading-text-container {
+        text-align: center;
+    }
+    .glitch-text {
+        font-size: 2rem;
+    }
+    .loading-subtitle {
+        font-size: 0.9rem;
+    }
+    .status-message {
+        font-size: 0.8rem;
+    }
+}
+
+
+/* Performance optimizations for mobile */
+
+@media (max-width: 768px) {
+    /* Reduce animations on mobile for better performance */
+    .floating-card,
+    .avatar-ring,
+    .particle,
+    .neural-node,
+    .neural-connection {
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+    }
+    /* Hide complex animations on very small screens */
+    @media (max-width: 480px) {
+        .bg-3d-elements,
+        .holographic-grid,
+        .neural-network {
+            display: none;
+        }
+        .loading-particles {
+            display: none;
+        }
+        .orbital-ring {
+            display: none;
+        }
+    }
+}
+
+
+/* Better focus states for accessibility */
+
+@media (max-width: 768px) {
+    .btn:focus,
+    .nav-link:focus,
+    .work-link:focus,
+    .social-link:focus {
+        outline: 2px solid var(--neon-cyan);
+        outline-offset: 2px;
+    }
+    .form-control:focus {
+        outline: 2px solid var(--neon-cyan);
+        outline-offset: 2px;
+        border-color: var(--neon-cyan);
+    }
+}
+
+
+/* Improved animations for mobile */
+
+@keyframes slideInRight {
+    from {
+        right: -100%;
+        opacity: 0;
+    }
+    to {
+        right: 0;
+        opacity: 1;
+    }
+}
+
+@keyframes mobileSlideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+/* Dark mode adjustments for mobile */
+
+@media (max-width: 768px) {
+    body.light-theme .nav-menu {
+        background: rgba(255, 255, 255, 0.98);
+        color: var(--text-primary);
+    }
+    body.light-theme .nav-link {
+        color: var(--text-primary);
+    }
+    body.light-theme .mobile-toggle span {
+        background: var(--text-primary);
+    }
+}
+
+
+/* Reduced motion for mobile users who prefer it */
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+    .nav-menu {
+        transition: none;
+    }
+    .nav-link {
+        transition: none;
+    }
+    .btn {
+        transition: none;
+    }
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+
+/* Print styles adjustments */
+
+@media print {
+    .nav-menu,
+    .mobile-toggle,
+    .hero-buttons,
+    .work-links,
+    .social-links,
+    .testimonial-navigation {
+        display: none !important;
+    }
+    .work-item,
+    .skill-item,
+    .highlight-item {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    .hero-title,
+    .section-title {
+        color: #000 !important;
+        text-shadow: none !important;
+    }
+}
+
+
+/* Very small screens (smartwatches, etc.) */
+
+@media (max-width: 320px) {
+    .hero-title {
+        font-size: 1.8rem;
+        line-height: 1.1;
+    }
+    .section-title {
+        font-size: 1.5rem;
+    }
+    .btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+    .nav-container {
+        padding: 0.75rem;
+    }
+    .section-container {
+        padding: 0 0.75rem;
+    }
+}
+
+
+/* Landscape phone optimization */
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero-section {
+        padding: 0.5rem 0;
+    }
+    .hero-container {
+        align-items: center;
+        min-height: auto;
+    }
+    .hero-title {
+        font-size: 1.8rem;
+        margin: 0.5rem 0;
+    }
+    .hero-buttons {
+        margin: 1rem 0;
+    }
+    .nav-menu {
+        padding-top: 2rem;
+    }
+    .section {
+        padding: 1.5rem 0;
+    }
+}

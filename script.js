@@ -586,62 +586,159 @@ function initThemeToggle() {
 function initMobileMenu() {
     const mobileToggle = document.getElementById('mobileToggle');
     const navMenu = document.getElementById('navMenu');
+    const navLinks = document.querySelectorAll('.nav-link');
 
-    if (mobileToggle) {
-        mobileToggle.addEventListener('click', () => {
+    if (mobileToggle && navMenu) {
+        // Toggle mobile menu
+        mobileToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
             navMenu.classList.toggle('active');
             mobileToggle.classList.toggle('active');
+
+            // Prevent body scroll when menu is open
+            if (navMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close menu when clicking on nav links
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                mobileToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+                navMenu.classList.remove('active');
+                mobileToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
+                mobileToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 991) {
+                navMenu.classList.remove('active');
+                mobileToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            }
         });
     }
 }
 
 // Interactive elements
 function initInteractiveElements() {
-    // Mouse movement parallax effect
-    document.addEventListener('mousemove', (e) => {
-        const mouseX = e.clientX / window.innerWidth;
-        const mouseY = e.clientY / window.innerHeight;
+    // Check if device is mobile
+    const isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-        // Move floating cards based on mouse position
+    // Only add mouse effects on non-mobile devices
+    if (!isMobile) {
+        // Mouse movement parallax effect
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+
+            // Move floating cards based on mouse position
+            const floatingCards = document.querySelectorAll('.floating-card');
+            floatingCards.forEach((card, index) => {
+                const speed = (index + 1) * 0.5;
+                const x = (mouseX - 0.5) * speed * 10;
+                const y = (mouseY - 0.5) * speed * 10;
+
+                card.style.transform = `translate(${x}px, ${y}px)`;
+            });
+
+            // Update particle system rotation based on mouse
+            if (particleSystem) {
+                particleSystem.rotation.y = mouseX * 0.1;
+                particleSystem.rotation.x = mouseY * 0.1;
+            }
+        });
+
+        // Floating cards hover effects
         const floatingCards = document.querySelectorAll('.floating-card');
-        floatingCards.forEach((card, index) => {
-            const speed = (index + 1) * 0.5;
-            const x = (mouseX - 0.5) * speed * 10;
-            const y = (mouseY - 0.5) * speed * 10;
+        floatingCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                gsap.to(card, { scale: 1.1, duration: 0.3, ease: 'power2.out' });
+            });
 
-            card.style.transform = `translate(${x}px, ${y}px)`;
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, { scale: 1, duration: 0.3, ease: 'power2.out' });
+            });
         });
 
-        // Update particle system rotation based on mouse
-        if (particleSystem) {
-            particleSystem.rotation.y = mouseX * 0.1;
-            particleSystem.rotation.x = mouseY * 0.1;
+        // Button hover effects
+        const buttons = document.querySelectorAll('.btn, .resume-btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                gsap.to(button, { y: -3, duration: 0.3, ease: 'power2.out' });
+            });
+
+            button.addEventListener('mouseleave', () => {
+                gsap.to(button, { y: 0, duration: 0.3, ease: 'power2.out' });
+            });
+        });
+    }
+
+    // Touch events for mobile
+    if (isMobile) {
+        // Add touch feedback for buttons
+        const buttons = document.querySelectorAll('.btn, .resume-btn, .nav-link');
+        buttons.forEach(button => {
+            button.addEventListener('touchstart', () => {
+                button.style.transform = 'scale(0.95)';
+            });
+
+            button.addEventListener('touchend', () => {
+                button.style.transform = '';
+            });
+        });
+
+        // Swipe gestures for testimonials
+        let startX, startY, endX, endY;
+        const testimonialsSection = document.querySelector('.testimonials-carousel');
+
+        if (testimonialsSection) {
+            testimonialsSection.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            });
+
+            testimonialsSection.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                endY = e.changedTouches[0].clientY;
+
+                const diffX = startX - endX;
+                const diffY = startY - endY;
+
+                // Only handle horizontal swipes
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                    if (diffX > 0) {
+                        // Swipe left - next slide
+                        nextSlide();
+                    } else {
+                        // Swipe right - previous slide
+                        prevSlide();
+                    }
+                }
+            });
         }
-    });
-
-    // Floating cards hover effects
-    const floatingCards = document.querySelectorAll('.floating-card');
-    floatingCards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            gsap.to(card, { scale: 1.1, duration: 0.3, ease: 'power2.out' });
-        });
-
-        card.addEventListener('mouseleave', () => {
-            gsap.to(card, { scale: 1, duration: 0.3, ease: 'power2.out' });
-        });
-    });
-
-    // Button hover effects
-    const buttons = document.querySelectorAll('.btn, .resume-btn');
-    buttons.forEach(button => {
-        button.addEventListener('mouseenter', () => {
-            gsap.to(button, { y: -3, duration: 0.3, ease: 'power2.out' });
-        });
-
-        button.addEventListener('mouseleave', () => {
-            gsap.to(button, { y: 0, duration: 0.3, ease: 'power2.out' });
-        });
-    });
+    }
 }
 
 // Start animations when page is loaded
