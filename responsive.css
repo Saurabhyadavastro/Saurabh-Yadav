@@ -7,6 +7,30 @@
 /* Base styles are mobile-first, then enhanced for larger screens */
 
 
+/* Fix navbar collision with hero section on mobile */
+
+@media (max-width: 991px) {
+    .hero-section {
+        padding-top: 100px !important;
+        /* Increased for mobile navbar */
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding-top: 120px !important;
+        /* More space for smaller mobile devices */
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding-top: 100px !important;
+        /* Adjust for very small screens */
+    }
+}
+
+
 /* Touch-friendly interactions */
 
 @media (pointer: coarse) {
@@ -79,7 +103,8 @@
         padding: 0 1rem;
     }
     .hero-section {
-        padding: 1rem 0 2rem;
+        padding: 100px 0 2rem !important;
+        /* Fixed navbar collision */
     }
     .hero-content {
         padding: 1rem 0;
